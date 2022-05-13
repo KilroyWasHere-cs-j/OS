@@ -1,4 +1,3 @@
-
     global loader                   ; the entry symbol for ELF
 
     MAGIC_NUMBER equ 0x1BADB002     ; define the magic number constant
