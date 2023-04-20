@@ -3,6 +3,9 @@ name = "OS"
 version = "0.1.0"
 edition = "2018"
 
+[build]
+target = "thumbv7em-none-eabihf"
+
 # the profile used for `cargo build`
 [profile.dev]
 panic = "abort" # disable stack unwinding on panic
