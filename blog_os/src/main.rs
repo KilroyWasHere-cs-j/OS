@@ -1,6 +1,8 @@
 #![no_std]
 #![no_main]
 
+//  qemu-system-x86_64 -drive format=raw,file=/home/gabrielt/Git/OS/blog_os/target/x86_64-blog_os/debug/bootimage-blog_os.bin
+
 use core::panic::PanicInfo;
 
 /// This function is called on panic.
