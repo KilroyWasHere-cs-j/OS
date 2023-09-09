@@ -9,6 +9,10 @@
 
 // https://os.phil-opp.com/
 
+mod display;
+
+use display::vga_buffer::print;
+
 use core::panic::PanicInfo;
 
 /// This function is called on panic.
@@ -17,20 +21,8 @@ fn panic(_info: &PanicInfo) -> ! {
     loop {}
 }
 
-fn print(hold: &[u8]){
-    let vga_buffer = 0xb8000 as *mut u8;
-
-    for (i, &byte) in hold.iter().enumerate() {
-        unsafe {
-            *vga_buffer.offset(i as isize * 2) = byte;
-            *vga_buffer.offset(i as isize * 2 + 1) = 0x8;
-        }
-    }
-
-}
-
 #[no_mangle]
 pub extern "C" fn _start() -> ! {
-    print(b"Hello World!");
+    print(b"Hello World!", display::vga_buffer::Color::Green);
     loop {}
 }
