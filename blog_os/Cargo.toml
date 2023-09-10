@@ -13,6 +13,7 @@ panic = "abort"
 bootloader = "0.9.3" # Literally can't be the newest version of bootloader for some reason
 volatile = "0.2.6"
 spin = "0.5.2"
+embedded-graphics = "0.8.1"
 
 [dependencies.lazy_static]
 version = "1.0"

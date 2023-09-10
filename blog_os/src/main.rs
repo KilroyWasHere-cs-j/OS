@@ -9,6 +9,8 @@
 
 // https://os.phil-opp.com/
 // https://blog.stephenmarz.com/2020/11/11/risc-v-os-using-rust-graphics/
+// https://crates.io/crates/embedded-graphics
+// https://github.com/drogue-iot/reqwless
 
 //https://en.wikipedia.org/wiki/Code_page_437 *for printing
 
@@ -26,7 +28,7 @@ fn panic(info: &PanicInfo) -> ! {
 
 #[no_mangle]
 pub extern "C" fn _start() -> ! {
-    println!("Booting GOS {}", "");
+    println!("Booting GabeOS {}", "...");
     tests::test_runner::run_all_tests();
     loop {}
 }

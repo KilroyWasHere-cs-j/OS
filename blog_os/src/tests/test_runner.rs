@@ -47,4 +47,5 @@ pub fn run_all_tests(){
     buffer_cursor_postion_check();
     buffer_advance_column_check();
     print!("All VGA buffer tests passed!");
+    vga_buffer::advance_column_test(5);
 }
