@@ -53,8 +53,8 @@ struct ScreenChar {
     color_code: ColorCode,
 }
 
-const BUFFER_HEIGHT: usize = 25;
-const BUFFER_WIDTH: usize = 80;
+pub const BUFFER_HEIGHT: usize = 25;
+pub const BUFFER_WIDTH: usize = 80;
 
 #[repr(transparent)]
 struct Buffer {
@@ -67,18 +67,47 @@ pub struct Writer {
     buffer: &'static mut Buffer,
 }
 
+pub fn cursor_position_test(pos: usize) -> bool{
+    let mut writer = Writer {
+        column_position: 0,
+        color_code: ColorCode::new(Color::Yellow, Color::Black),
+        buffer: unsafe { &mut *(0xb8000 as *mut Buffer) },
+    };
+    writer.set_column_position(pos);
+    if writer.get_column_position() == pos{
+        return true;
+    }
+    else {
+        return false;
+    }
+}
+
+pub fn advance_column_test(pos: usize) -> bool{
+    let mut writer = Writer {
+        column_position: 0,
+        color_code: ColorCode::new(Color::Yellow, Color::Black),
+        buffer: unsafe { &mut *(0xb8000 as *mut Buffer) },
+    };
+    writer.advance_column_position(pos);
+    if writer.get_column_position() == pos{
+        return true;
+    }
+    else {
+        return false;
+    }
+}
+
 #[allow(dead_code)]
-pub fn print_something() {
-    use core::fmt::Write;
+/// Used to test the VGA buffer, this funtion is TEST ONLY
+pub fn test_print() {
     let mut writer = Writer {
         column_position: 0,
         color_code: ColorCode::new(Color::Yellow, Color::Black),
         buffer: unsafe { &mut *(0xb8000 as *mut Buffer) },
     };
 
-    writer.write_byte(b'H');
-    writer.write_string("ello! ");
-    write!(writer, "The numbers are {} and {}", 42, 1.0/3.0).unwrap();
+    writer.write_byte(b'T');
+    writer.write_string("est ");
 }
 
 impl Writer {
@@ -101,6 +130,22 @@ impl Writer {
                 self.column_position += 1;
             }
         }
+    }
+
+    /// Returns the current column position
+    /// * Returns: usize
+    pub fn get_column_position(&self) -> usize {
+        self.column_position
+    }
+
+    /// Sets the current column position
+    /// * position: usize
+    pub fn set_column_position(&mut self, position: usize) {
+        self.column_position = position;
+    }
+
+    pub fn advance_column_position(&mut self, amount: usize) {
+        self.column_position += amount;
     }
 
     pub fn write_string(&mut self, s: &str) {
