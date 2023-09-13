@@ -12,7 +12,7 @@
 // https://crates.io/crates/embedded-graphics
 // https://github.com/drogue-iot/reqwless
 
-//https://en.wikipedia.org/wiki/Code_page_437 *for printing
+//https://en.wikipedia.org/wiki/Code_page_437 for printing
 
 mod display;
 mod tests;
