@@ -28,7 +28,10 @@ fn panic(info: &PanicInfo) -> ! {
 
 #[no_mangle]
 pub extern "C" fn _start() -> ! {
+    // Let user know that the OS is booting
     println!("Booting GabeOS {}", "...");
+    // Run a the on boot systems tests
     tests::test_runner::run_all_tests();
+    // Enter main OS runner loop
     loop {} 
 }
