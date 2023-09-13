@@ -30,5 +30,5 @@ fn panic(info: &PanicInfo) -> ! {
 pub extern "C" fn _start() -> ! {
     println!("Booting GabeOS {}", "...");
     tests::test_runner::run_all_tests();
-    loop {}
+    loop {} 
 }

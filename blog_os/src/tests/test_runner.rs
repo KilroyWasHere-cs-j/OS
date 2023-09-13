@@ -44,8 +44,8 @@ pub fn run_all_tests(){
     print_test();
     vga_buffer_quick_test();
     buffer_size_check();
-    buffer_cursor_postion_check();
     buffer_advance_column_check();
+    buffer_cursor_postion_check();
     print!("All VGA buffer tests passed!");
     vga_buffer::advance_column_test(5);
 }
