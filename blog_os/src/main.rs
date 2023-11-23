@@ -3,7 +3,7 @@
 
 //  qemu-system-x86_64 -drive format=raw,file=/home/gabrielt/Git/OS/blog_os/target/x86_64-blog_os/debug/bootimage-blog_os.bin
 
-// ? To deploy 
+// ? To deploy
 // ? cargo bootimage
 // ? qemu-system-x86_64 -drive format=raw,file=target/x86_64-blog_os/debug/bootimage-blog_os.bin
 
@@ -12,10 +12,11 @@
 // https://crates.io/crates/embedded-graphics
 // https://github.com/drogue-iot/reqwless
 
-//https://en.wikipedia.org/wiki/Code_page_437 for printing
+//https://en.wikipedia.org/wiki/Code_page_437 for printing characters
 
 mod display;
 mod tests;
+mod utils;
 
 use core::panic::PanicInfo;
 
@@ -30,8 +31,13 @@ fn panic(info: &PanicInfo) -> ! {
 pub extern "C" fn _start() -> ! {
     // Let user know that the OS is booting
     println!("Booting GabeOS {}", "...");
+    println!("Running Pre-boot Tests {}", "...");
     // Run a the on boot systems tests
     tests::test_runner::run_all_tests();
-    // Enter main OS runner loop
-    loop {} 
+    println!("Pre-boot Tests Passed {}", "...");
+
+    loop {
+        utils::delay::delay_s(10);
+        println!("GabeOS says hello...")
+    }
 }
