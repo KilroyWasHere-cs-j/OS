@@ -4,17 +4,28 @@
 #![test_runner(blog_os::test_runner)]
 #![reexport_test_harness_main = "test_main"]
 
-use blog_os::println;
+use bootloader::BootInfo;
+use bootloader::entry_point;
+
+use blog_os::{memory, println};
 use core::panic::PanicInfo;
+use x86_64::structures::paging::Page;
+use blog_os::memory::BootInfoFrameAllocator;
 
-#[no_mangle]
-pub extern "C" fn _start() -> ! {
+entry_point!(kernel_main);
+
+fn kernel_main(boot_info: &'static BootInfo) -> !{
+    use blog_os::memory;
+    use x86_64::{structures::paging::Page, VirtAddr};
+    use blog_os::memory::translate_addr;
+
+
     println!("Hello World{}", "!");
-
     blog_os::init();
 
-    // invoke a breakpoint exception
-    x86_64::instructions::interrupts::int3();
+    let mut frame_allocator = unsafe {
+        BootInfoFrameAllocator::init(&boot_info.memory_map)
+    };
 
     #[cfg(test)]
     test_main();
