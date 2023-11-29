@@ -1,43 +1,43 @@
 #![no_std]
 #![no_main]
+#![feature(custom_test_frameworks)]
+#![test_runner(blog_os::test_runner)]
+#![reexport_test_harness_main = "test_main"]
 
-//  qemu-system-x86_64 -drive format=raw,file=/home/gabrielt/Git/OS/blog_os/target/x86_64-blog_os/debug/bootimage-blog_os.bin
-
-// ? To deploy
-// ? cargo bootimage
-// ? qemu-system-x86_64 -drive format=raw,file=target/x86_64-blog_os/debug/bootimage-blog_os.bin
-
-// https://os.phil-opp.com/
-// https://blog.stephenmarz.com/2020/11/11/risc-v-os-using-rust-graphics/
-// https://crates.io/crates/embedded-graphics
-// https://github.com/drogue-iot/reqwless
-
-//https://en.wikipedia.org/wiki/Code_page_437 for printing characters
-
-mod display;
-mod tests;
-mod utils;
-
+use blog_os::println;
 use core::panic::PanicInfo;
 
+#[no_mangle]
+pub extern "C" fn _start() -> ! {
+    println!("Hello World{}", "!");
+
+    blog_os::init();
+
+    // invoke a breakpoint exception
+    x86_64::instructions::interrupts::int3();
+
+    #[cfg(test)]
+    test_main();
+
+    println!("It did not crash!");
+    loop {}
+}
+
 /// This function is called on panic.
+#[cfg(not(test))]
 #[panic_handler]
 fn panic(info: &PanicInfo) -> ! {
     println!("{}", info);
     loop {}
 }
 
-#[no_mangle]
-pub extern "C" fn _start() -> ! {
-    // Let user know that the OS is booting
-    println!("Booting GabeOS {}", "...");
-    println!("Running Pre-boot Tests {}", "...");
-    // Run a the on boot systems tests
-    tests::test_runner::run_all_tests();
-    println!("Pre-boot Tests Passed {}", "...");
+#[cfg(test)]
+#[panic_handler]
+fn panic(info: &PanicInfo) -> ! {
+    blog_os::test_panic_handler(info)
+}
 
-    loop {
-        utils::delay::delay_s(10);
-        println!("GabeOS says hello...")
-    }
+#[test_case]
+fn trivial_assertion() {
+    assert_eq!(1, 1);
 }
