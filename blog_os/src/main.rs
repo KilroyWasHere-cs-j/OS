@@ -20,7 +20,7 @@ fn kernel_main(boot_info: &'static BootInfo) -> !{
     use blog_os::memory::translate_addr;
 
 
-    println!("Hello World{}", "!");
+    println!("Booting into Gabian...{}", "!");
     blog_os::init();
 
     let mut frame_allocator = unsafe {
@@ -30,7 +30,6 @@ fn kernel_main(boot_info: &'static BootInfo) -> !{
     #[cfg(test)]
     test_main();
 
-    println!("It did not crash!");
     loop {}
 }
 

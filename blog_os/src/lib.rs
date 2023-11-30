@@ -7,6 +7,9 @@
 
 use core::panic::PanicInfo;
 
+extern crate alloc;
+
+
 pub mod interrupts;
 pub mod serial;
 pub mod vga_buffer;
