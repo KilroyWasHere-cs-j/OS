@@ -3,32 +3,73 @@
 #![feature(custom_test_frameworks)]
 #![test_runner(blog_os::test_runner)]
 #![reexport_test_harness_main = "test_main"]
+#![feature(abi_x86_interrupt)]
+extern crate alloc;
 
-use bootloader::BootInfo;
+use alloc::boxed::Box;
+
 use bootloader::entry_point;
+use bootloader::BootInfo;
 
-use blog_os::{memory, println};
-use core::panic::PanicInfo;
-use x86_64::structures::paging::Page;
 use blog_os::memory::BootInfoFrameAllocator;
+use blog_os::{init, memory, print, println};
+use core::arch::asm;
+use core::panic::PanicInfo;
+use pc_keyboard::Keyboard;
+use x86_64::structures::paging::Page;
+
+use alloc::{rc::Rc, vec, vec::Vec};
+use bootloader::bootinfo::MemoryRegionType::Kernel;
+
+use crate::kernel::keyboard;
+
+mod kernel;
+
+// let micros = 200_000_u32.microseconds();                // 200_000 ╬╝s
+// let millis: Milliseconds = micros.into();               // 200 ms
+// let frequency: Result<Hertz,_> = millis.to_rate();      // 5 Hz
+//
+// assert_eq!(frequency, Ok(5_u32.Hz()));
 
 entry_point!(kernel_main);
-
-fn kernel_main(boot_info: &'static BootInfo) -> !{
-    use blog_os::memory;
-    use x86_64::{structures::paging::Page, VirtAddr};
-    use blog_os::memory::translate_addr;
-
-
-    println!("Booting into Gabian...{}", "!");
+fn kernel_main(boot_info: &'static BootInfo) -> ! {
+    use blog_os::allocator;
+    use x86_64::VirtAddr;
+    println!("{}", "Starting boot");
     blog_os::init();
 
-    let mut frame_allocator = unsafe {
-        BootInfoFrameAllocator::init(&boot_info.memory_map)
-    };
+    let phys_mem_offset = VirtAddr::new(boot_info.physical_memory_offset);
+    let mut mapper = unsafe { memory::init(phys_mem_offset) };
+    let mut frame_allocator = unsafe { BootInfoFrameAllocator::init(&boot_info.memory_map) };
 
-    #[cfg(test)]
-    test_main();
+    allocator::init_heap(&mut mapper, &mut frame_allocator).expect("heap initialization failed");
+
+    // // allocate a number on the heap
+    // let heap_value = Box::new(41);
+    // println!("heap_value at {:p}", heap_value);
+    //
+    // // create a dynamically sized vector
+    // let mut vec = Vec::new();
+    // for i in 0..500 {
+    //     vec.push(i);
+    // }
+    // println!("vec at {:p}", vec.as_slice());
+
+    // create a reference counted vector -> will be freed when count reaches 0
+    let reference_counted = Rc::new(vec![1, 2, 3]);
+    let cloned_reference = reference_counted.clone();
+    println!(
+        "current reference count is {}",
+        Rc::strong_count(&cloned_reference)
+    );
+
+    core::mem::drop(reference_counted);
+    println!(
+        "reference count is {} now",
+        Rc::strong_count(&cloned_reference)
+    );
+
+    println!("It did not crash!");
 
     loop {}
 }

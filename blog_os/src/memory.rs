@@ -4,10 +4,9 @@ use x86_64::{
     PhysAddr,
     structures::paging::{Page, PhysFrame, Mapper, Size4KiB, FrameAllocator}
 };
+
 use x86_64::structures::paging::OffsetPageTable;
-
 use bootloader::bootinfo::MemoryMap;
-
 use bootloader::bootinfo::MemoryRegionType;
 
 impl BootInfoFrameAllocator {

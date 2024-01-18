@@ -4,21 +4,23 @@
 #![feature(abi_x86_interrupt)]
 #![test_runner(crate::test_runner)]
 #![reexport_test_harness_main = "test_main"]
-
+#[feature(abi_x86_interrupt)]
 use core::panic::PanicInfo;
 
 extern crate alloc;
 
-
+pub mod allocator;
 pub mod interrupts;
+pub mod memory;
 pub mod serial;
 pub mod vga_buffer;
-pub mod memory;
-
 
 pub fn init() {
     interrupts::init_idt();
+    unsafe { interrupts::PICS.lock().initialize() }; // new
+    x86_64::instructions::interrupts::enable(); // new
 }
+
 pub trait Testable {
     fn run(&self) -> ();
 }
