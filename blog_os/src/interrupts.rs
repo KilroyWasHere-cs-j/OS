@@ -1,9 +1,8 @@
-use crate::{print, println};
 use alloc::string::String;
 use lazy_static::lazy_static;
 use pc_keyboard::{layouts, DecodedKey, HandleControl, Keyboard, ScancodeSet1};
 use x86_64::{
-    instructions::{interrupts, port::Port},
+    instructions::port::Port,
     structures::idt::{InterruptDescriptorTable, InterruptStackFrame},
 };
 
@@ -16,6 +15,8 @@ use spin;
 use kernel::keyboard::KeyboardHandler;
 
 use kernel::tick;
+
+use crate::{print, println};
 
 pub const PIC_1_OFFSET: u8 = 32;
 pub const PIC_2_OFFSET: u8 = PIC_1_OFFSET + 8;
@@ -46,17 +47,19 @@ lazy_static! {
 
 /// Interrupt handler for the timer
 extern "x86-interrupt" fn timer_interrupt_handler(_stack_frame: InterruptStackFrame) {
-    // Commented out because it's pointless and gets in the way
-    //let keys = KEYBOARD.lock().revel_text();
-
+    // call the tick function
     tick::tick();
 
+    // get keyboard buffer
     let keys = KEYBOARD.lock().revel_text();
-    KEYBOARD.lock().clear_text();
+    // clear the buffer
+    KEYBOARD.lock().flush();
 
+    // only print if there are keys to print
     if !keys.is_empty() {
         print!("{}", keys.iter().collect::<String>());
     }
+
     // notify system that the interrupt has been handled
     unsafe {
         PICS.lock()

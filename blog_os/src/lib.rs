@@ -48,7 +48,9 @@ pub fn test_panic_handler(info: &PanicInfo) -> ! {
     serial_println!("[failed]\n");
     serial_println!("Error: {}\n", info);
     exit_qemu(QemuExitCode::Failed);
-    loop {}
+    loop {
+        x86_64::instructions::hlt();
+    }
 }
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
@@ -79,5 +81,8 @@ fn test_kernel_main(_boot_info: &'static BootInfo) -> ! {
     // like before
     init();
     test_main();
-    hlt_loop();
+    // hlt_loop();
+    loop {
+        x86_64::instructions::hlt();
+    }
 }

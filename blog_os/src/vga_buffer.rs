@@ -1,3 +1,4 @@
+// TODO: Replace this
 use core::fmt;
 use lazy_static::lazy_static;
 use spin::Mutex;
@@ -85,6 +86,10 @@ impl Writer {
     pub fn write_byte(&mut self, byte: u8) {
         match byte {
             b'\n' => self.new_line(),
+            b'\r' => {
+                let row = BUFFER_HEIGHT - 1;
+                self.clear_row(row);
+            }
             byte => {
                 if self.column_position >= BUFFER_WIDTH {
                     self.new_line();
@@ -132,7 +137,7 @@ impl Writer {
     }
 
     /// Clears a row by overwriting it with blank characters.
-    fn clear_row(&mut self, row: usize) {
+    pub fn clear_row(&mut self, row: usize) {
         let blank = ScreenChar {
             ascii_character: b' ',
             color_code: self.color_code,
@@ -161,6 +166,12 @@ macro_rules! print {
 macro_rules! println {
     () => ($crate::print!("\n"));
     ($($arg:tt)*) => ($crate::print!("{}\n", format_args!($($arg)*)));
+}
+
+#[macro_export]
+macro_rules! printr {
+    () => ($crate::print!("\r"));
+    ($($arg:tt)*) => ($crate::print!("{}\r", format_args!($($arg)*)));
 }
 
 /// Prints the given formatted string to the VGA text buffer through the global `WRITER` instance.

@@ -6,35 +6,22 @@
 #![feature(abi_x86_interrupt)]
 extern crate alloc;
 
-use alloc::boxed::Box;
-
 use bootloader::entry_point;
 use bootloader::BootInfo;
 
 use blog_os::memory::BootInfoFrameAllocator;
-use blog_os::{init, memory, print, println};
-use core::arch::asm;
+use blog_os::{memory, println};
 use core::panic::PanicInfo;
-use pc_keyboard::Keyboard;
-use x86_64::structures::paging::Page;
 
-use alloc::{rc::Rc, vec, vec::Vec};
-use bootloader::bootinfo::MemoryRegionType::Kernel;
-
-use crate::kernel::keyboard;
+use alloc::{rc::Rc, vec};
 
 mod kernel;
-
-// let micros = 200_000_u32.microseconds();                // 200_000 ╬╝s
-// let millis: Milliseconds = micros.into();               // 200 ms
-// let frequency: Result<Hertz,_> = millis.to_rate();      // 5 Hz
-//
-// assert_eq!(frequency, Ok(5_u32.Hz()));
 
 entry_point!(kernel_main);
 fn kernel_main(boot_info: &'static BootInfo) -> ! {
     use blog_os::allocator;
     use x86_64::VirtAddr;
+
     println!("{}", "Starting boot");
     blog_os::init();
 
@@ -58,6 +45,8 @@ fn kernel_main(boot_info: &'static BootInfo) -> ! {
     // create a reference counted vector -> will be freed when count reaches 0
     let reference_counted = Rc::new(vec![1, 2, 3]);
     let cloned_reference = reference_counted.clone();
+
+    // Memory tests
     println!(
         "current reference count is {}",
         Rc::strong_count(&cloned_reference)
@@ -70,6 +59,8 @@ fn kernel_main(boot_info: &'static BootInfo) -> ! {
     );
 
     println!("It did not crash!");
+
+    kernel::display::test();
 
     loop {}
 }

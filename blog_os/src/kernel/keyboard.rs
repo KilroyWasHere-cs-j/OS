@@ -1,5 +1,4 @@
-use crate::print;
-use alloc::{string::String, vec::Vec};
+use alloc::vec::Vec;
 
 pub struct Keyboard {
     text_buffer: Vec<char>,
@@ -11,14 +10,19 @@ pub trait KeyboardHandler {
     fn new() -> Self;
     fn on_key(&mut self, key: char);
     fn revel_text(&self) -> Vec<char>;
-    fn clear_text(&mut self);
+    fn flush(&mut self);
     fn set_caps_lock(&mut self, state: bool);
     fn set_shift(&mut self, state: bool);
 }
 
 impl KeyboardHandler for Keyboard {
     fn on_key(&mut self, key: char) {
-        self.text_buffer.push(key);
+        // ! TODO: Backspace doesn't work
+        if key == '\u{8}' {
+            self.text_buffer.pop();
+        } else {
+            self.text_buffer.push(key);
+        }
     }
 
     fn new() -> Self {
@@ -33,7 +37,7 @@ impl KeyboardHandler for Keyboard {
         self.text_buffer.clone()
     }
 
-    fn clear_text(&mut self) {
+    fn flush(&mut self) {
         self.text_buffer.clear();
     }
 
