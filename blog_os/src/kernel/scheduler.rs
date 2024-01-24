@@ -38,9 +38,32 @@ pub struct Task {
     priority: TaskPriority,
 }
 
-pub struct LongTermScheduler {}
+/// Trait defining a scheduler` 
+pub trait Scheduler {
+    /// Adds a task to the scheduler
+    fn add_task(&mut self, task: Task);
+    /// Removes a task from the scheduler
+    fn remove_task(&mut self, task: Task);
+    /// Updates all scheduled tasks
+    fn tick(&mut self);
+}
 
-pub struct ShortTermScheduler {}
+/// Long term scheduler
+pub struct LongTermScheduler {
+    /// The job pool
+    job_pool: Arc<Mutex<Vec<Task>>>,
+    /// The ready queue
+    ready_queue: Arc<Mutex<Vec<Task>>>,
+    /// The blocked queue
+    blocked_queue: Arc<Mutex<Vec<Task>>>,
+    /// The finished queue
+    finished_queue: Arc<Mutex<Vec<Task>>>,
+}
 
-/// Updates all scheduled tasks
-pub fn tick() {}
+/// Short term scheduler
+pub struct ShortTermScheduler {
+    /// The ready queue
+    ready_queue: Arc<Mutex<Vec<Task>>>,
+    /// The running task
+    running_task: Arc<Mutex<Task>>,
+}

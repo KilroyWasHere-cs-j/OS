@@ -13,7 +13,6 @@ pub mod allocator;
 pub mod interrupts;
 pub mod memory;
 pub mod serial;
-pub mod vga_buffer;
 
 pub fn init() {
     interrupts::init_idt();
