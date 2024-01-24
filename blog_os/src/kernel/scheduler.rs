@@ -38,7 +38,7 @@ pub struct Task {
     priority: TaskPriority,
 }
 
-/// Trait defining a scheduler` 
+/// Trait defining a scheduler`
 pub trait Scheduler {
     /// Adds a task to the scheduler
     fn add_task(&mut self, task: Task);
