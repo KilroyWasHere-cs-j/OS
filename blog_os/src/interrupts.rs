@@ -16,8 +16,8 @@ mod kernel;
 use pic8259::ChainedPics;
 use spin::{self, Mutex};
 
-use kernel::keyboard::KeyboardHandler;
 use crate::interrupts::kernel::display;
+use kernel::keyboard::KeyboardHandler;
 
 // use crate::{print, println};
 
@@ -50,7 +50,6 @@ lazy_static! {
 
 /// Interrupt handler for the timer
 extern "x86-interrupt" fn timer_interrupt_handler(_stack_frame: InterruptStackFrame) {
-
     // get keyboard buffer
     let keys = KEYBOARD.lock().revel_text();
     // clear the buffer
