@@ -14,10 +14,14 @@ use alloc::{
 mod kernel;
 
 use pic8259::ChainedPics;
-use spin::{self, Mutex};
+
+use crate::interrupts::kernel::scheduler::Scheduler;
 
 use crate::interrupts::kernel::display;
 use kernel::keyboard::KeyboardHandler;
+
+use self::kernel::scheduler::{JobPool, Task, TaskPriority, TaskState};
+use crate::interrupts::kernel::keyboard::KEYBOARD;
 
 // use crate::{print, println};
 
@@ -26,11 +30,6 @@ pub const PIC_2_OFFSET: u8 = PIC_1_OFFSET + 8;
 
 pub static PICS: spin::Mutex<ChainedPics> =
     spin::Mutex::new(unsafe { ChainedPics::new(PIC_1_OFFSET, PIC_2_OFFSET) });
-
-lazy_static! {
-    static ref KEYBOARD: spin::Mutex<kernel::keyboard::Keyboard> =
-        spin::Mutex::new(kernel::keyboard::Keyboard::new());
-}
 
 lazy_static! {
     // create a static referenceuse to the interrupt descriptor table

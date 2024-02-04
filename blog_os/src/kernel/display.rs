@@ -175,6 +175,7 @@ impl WriterTrait for Writer {
     fn test(&mut self, hold: u8) {}
 }
 
+/// TODO: All the code below needs/should be replaced with less satanic shit
 // TODO: Replace with println! and print! macros before release
 pub fn print_s(v: String){
     WRITER.lock().print(v);

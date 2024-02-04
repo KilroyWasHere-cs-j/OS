@@ -3,6 +3,9 @@ use alloc::{sync::Arc, vec::Vec};
 use lazy_static::lazy_static;
 use spin::Mutex;
 
+lazy_static! {
+    pub static ref KEYBOARD: spin::Mutex<Keyboard> = spin::Mutex::new(Keyboard::new());
+}
 
 pub struct Keyboard {
     text_buffer: Vec<char>,

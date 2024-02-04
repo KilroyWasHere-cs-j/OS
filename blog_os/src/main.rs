@@ -6,28 +6,29 @@
 #![feature(abi_x86_interrupt)]
 extern crate alloc;
 
+use alloc::boxed::Box;
 use alloc::string::{String, ToString};
+use alloc::sync::Arc;
+use alloc::vec::Vec;
 use bootloader::entry_point;
 use bootloader::BootInfo;
 
+use alloc::{rc::Rc, vec};
 use blog_os::memory;
 use blog_os::memory::BootInfoFrameAllocator;
 use core::panic::PanicInfo;
-
-use alloc::{rc::Rc, vec};
-use alloc::borrow::ToOwned;
-use alloc::boxed::Box;
-use alloc::vec::Vec;
-
-use kernel::display::Writer;
-use crate::kernel::display;
+use lazy_static::lazy_static;
+use spin::Mutex;
 
 use crate::kernel::display::{force_new_line, print, print_s, println, println_s, reset_screen};
-use crate::kernel::display::WRITER;
+use crate::kernel::scheduler::JobPool;
 
-
-mod kernel;
 mod System69;
+mod kernel;
+
+lazy_static! {
+    pub static ref JOBPOOL: Arc<Mutex<JobPool>> = Arc::new(Mutex::new(JobPool::new()));
+}
 
 entry_point!(kernel_main);
 fn kernel_main(boot_info: &'static BootInfo) -> ! {
@@ -71,7 +72,7 @@ pub fn memory_tests() {
     for i in 0..20 {
         vec.push(i);
     }
-    print( "vec: ");
+    print("vec: ");
     println_s(vec.iter().map(|&x| x.to_string()).collect::<String>());
 
     print("Heap allocation tests done!");

@@ -1,0 +1,5 @@
+"filename", "language", "XML", "Rust", "comment", "blank", "total"
+"/home/gabrielt/Git/OS/.idea/csv-editor.xml", "XML", 16, 0, 0, 0, 16
+"/home/gabrielt/Git/OS/blog_os/src/kernel/display.rs", "Rust", 0, 0, 1, 0, 1
+"/home/gabrielt/Git/OS/blog_os/src/kernel/scheduler.rs", "Rust", 0, 0, 1, 1, 2
+"Total", "-", 16, 0, 2, 1, 19
