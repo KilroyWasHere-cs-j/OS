@@ -15,7 +15,7 @@ use pic8259::ChainedPics;
 use crate::interrupts::kernel::display;
 use kernel::keyboard::KeyboardHandler;
 
-use self::kernel::scheduler::{Task, TaskPriority, TaskState, JOBPOOL};
+use self::kernel::scheduler::{self, Task, TaskPriority, TaskState, JOBPOOL};
 use crate::interrupts::kernel::keyboard::KEYBOARD;
 
 // use crate::{print, println};
@@ -55,19 +55,7 @@ fn keyboard_task() {
 
 /// Interrupt handler for the timer
 extern "x86-interrupt" fn timer_interrupt_handler(_stack_frame: InterruptStackFrame) {
-    // // get keyboard buffer
-    // let keys = KEYBOARD.lock().revel_text();
-    // // clear the buffer
-    // KEYBOARD.lock().flush();
-
-    // //writer.test(2);
-
-    // // writer.clear_line();
-    // // only print if there are keys to print
-    // if !keys.is_empty() {
-    //     display::print_s(keys.iter().collect::<String>());
-    // }
-
+    // create a new task for the keyboard
     let keyboard_task = Task {
         id: 0,
         state: TaskState::Ready,
@@ -75,9 +63,12 @@ extern "x86-interrupt" fn timer_interrupt_handler(_stack_frame: InterruptStackFr
         fn_ptr: keyboard_task,
     };
 
+    // add the task to the job pool
     JOBPOOL.lock().add_task(keyboard_task);
+    // call tick so the schedulers can do their updating
+    scheduler::tick();
 
-    // notify system that the interrupt has been handled
+    // notify system that the interrupt has been handled and it's okay to unlock
     unsafe {
         PICS.lock()
             .notify_end_of_interrupt(InterruptIndex::Timer.as_u8());
