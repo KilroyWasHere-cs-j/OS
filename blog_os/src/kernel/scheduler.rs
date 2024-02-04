@@ -1,8 +1,14 @@
 use alloc::{sync::Arc, vec::Vec};
+use lazy_static::lazy_static;
+use spin::Mutex;
 
 /// Struct to store the job pool
 pub struct JobPool {
     pub jobs: Vec<Arc<Task>>,
+}
+
+lazy_static! {
+    pub static ref JOBPOOL: Arc<Mutex<JobPool>> = Arc::new(Mutex::new(JobPool::new()));
 }
 
 /// Task state
@@ -35,20 +41,7 @@ pub struct Task {
     pub id: usize,
     pub state: TaskState,
     pub priority: TaskPriority,
-}
-
-impl JobPool {
-    pub fn new() -> Self {
-        JobPool { jobs: Vec::new() }
-    }
-
-    pub fn add_job(&mut self, job: Arc<Task>) {
-        self.jobs.push(job);
-    }
-
-    pub fn remove_job(&mut self, job: Arc<Task>) {
-        todo!();
-    }
+    pub fn_ptr: fn(),
 }
 
 /// Trait defining a scheduler`
@@ -60,4 +53,18 @@ pub trait Scheduler {
     fn remove_task(&mut self, task: Task);
     /// Updates all scheduled tasks
     fn tick(&mut self);
+}
+
+impl JobPool {
+    pub fn new() -> Self {
+        JobPool { jobs: Vec::new() }
+    }
+
+    pub fn add_task(&mut self, task: Task) {
+        self.jobs.push(Arc::new(task));
+    }
+
+    pub fn remove_task(&mut self, task: Task) {
+        self.jobs.retain(|x| x.id != task.id);
+    }
 }

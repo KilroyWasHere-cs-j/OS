@@ -5,22 +5,17 @@ use x86_64::{
     structures::idt::{InterruptDescriptorTable, InterruptStackFrame},
 };
 
-use alloc::{
-    string::{String, ToString},
-    sync::Arc,
-};
+use alloc::string::String;
 
 #[path = "./kernel/mod.rs"]
 mod kernel;
 
 use pic8259::ChainedPics;
 
-use crate::interrupts::kernel::scheduler::Scheduler;
-
 use crate::interrupts::kernel::display;
 use kernel::keyboard::KeyboardHandler;
 
-use self::kernel::scheduler::{JobPool, Task, TaskPriority, TaskState};
+use self::kernel::scheduler::{Task, TaskPriority, TaskState, JOBPOOL};
 use crate::interrupts::kernel::keyboard::KEYBOARD;
 
 // use crate::{print, println};
@@ -45,22 +40,42 @@ lazy_static! {
     };
 }
 
-// Interrupt handlers
-
-/// Interrupt handler for the timer
-extern "x86-interrupt" fn timer_interrupt_handler(_stack_frame: InterruptStackFrame) {
-    // get keyboard buffer
+fn keyboard_task() {
     let keys = KEYBOARD.lock().revel_text();
     // clear the buffer
     KEYBOARD.lock().flush();
-
-    //writer.test(2);
-
     // writer.clear_line();
     // only print if there are keys to print
     if !keys.is_empty() {
         display::print_s(keys.iter().collect::<String>());
     }
+}
+
+// Interrupt handlers
+
+/// Interrupt handler for the timer
+extern "x86-interrupt" fn timer_interrupt_handler(_stack_frame: InterruptStackFrame) {
+    // // get keyboard buffer
+    // let keys = KEYBOARD.lock().revel_text();
+    // // clear the buffer
+    // KEYBOARD.lock().flush();
+
+    // //writer.test(2);
+
+    // // writer.clear_line();
+    // // only print if there are keys to print
+    // if !keys.is_empty() {
+    //     display::print_s(keys.iter().collect::<String>());
+    // }
+
+    let keyboard_task = Task {
+        id: 0,
+        state: TaskState::Ready,
+        priority: TaskPriority::High,
+        fn_ptr: keyboard_task,
+    };
+
+    JOBPOOL.lock().add_task(keyboard_task);
 
     // notify system that the interrupt has been handled
     unsafe {
@@ -83,7 +98,7 @@ extern "x86-interrupt" fn keyboard_interrupt_handler(_stack_frame: InterruptStac
         if let Some(key) = keyboard.process_keyevent(key_event) {
             match key {
                 DecodedKey::Unicode(character) => KEYBOARD.lock().on_key(character),
-                DecodedKey::RawKey(key) => (),
+                DecodedKey::RawKey(_key) => (),
             }
         }
     }
@@ -95,7 +110,7 @@ extern "x86-interrupt" fn keyboard_interrupt_handler(_stack_frame: InterruptStac
     }
 }
 
-extern "x86-interrupt" fn divide_error_handler(stack_frame: InterruptStackFrame) {
+extern "x86-interrupt" fn divide_error_handler(_stack_frame: InterruptStackFrame) {
     // println!("EXCEPTION: DIVIDE ERROR\n{:#?}", stack_frame);
 }
 
@@ -120,7 +135,7 @@ impl InterruptIndex {
     }
 }
 
-extern "x86-interrupt" fn breakpoint_handler(stack_frame: InterruptStackFrame) {
+extern "x86-interrupt" fn breakpoint_handler(_stack_frame: InterruptStackFrame) {
     // ! Don't uncomment this shit it will break the OS's boot
     // Check tests for possible cause :)
     //println!("EXCEPTION: BREAKPOINT\n{:#?}", stack_frame);
