@@ -1,4 +1,4 @@
-use alloc::{string::ToString, sync::Arc, task, vec::Vec};
+use alloc::{sync::Arc, vec::Vec};
 use lazy_static::lazy_static;
 use spin::Mutex;
 
@@ -159,8 +159,7 @@ impl Scheduler for ShortTermScheduler {
         for task in TASK_QUEUE.lock().iter() {
             let fn_ptr = task.fn_ptr;
             fn_ptr();
-            print("Executing task");
-            println(&task.id.to_string()); // Convert usize to string
+            // Convert usize to string
             //TODO wrap task in a mutex so that we can change its state
         }
     }
