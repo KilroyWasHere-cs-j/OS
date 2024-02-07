@@ -5,7 +5,7 @@ use x86_64::{
     structures::idt::{InterruptDescriptorTable, InterruptStackFrame},
 };
 
-use alloc::{string::String, vec::Vec};
+use alloc::string::String;
 
 #[path = "./System69/mod.rs"]
 mod System69;
@@ -18,7 +18,7 @@ use pic8259::ChainedPics;
 use crate::interrupts::kernel::display;
 use kernel::keyboard::KeyboardHandler;
 
-use self::{kernel::{display::{print, println}, scheduler::{self, Task, TaskPriority, TaskState, JOBPOOL}}, System69::cmdprmpt};
+use self::kernel::{display::print, scheduler::{Task, TaskPriority, TaskState, JOBPOOL}};
 use crate::interrupts::kernel::keyboard::KEYBOARD;
 
 // use crate::{print, println};
@@ -54,31 +54,6 @@ fn keyboard_task() {
     }
 }
 
-pub fn process_prmt(){
-    // Need a better way to do this
-    let prompt = "";
-    match prompt {
-        "help" => {
-            println("Commands: ");
-            println("help - display this message");
-            println("clear - clear the screen");
-            println("exit - exit the shell");
-        },
-        "clear" => {
-            display::reset_screen();
-        },
-        "exit" => {
-            display::reset_screen();
-            println("Exiting...");
-            // exit the shell
-            // exit(0);
-        },
-        _ => {
-            // Do nothing
-        }
-    }
-}
-
 // Interrupt handlers
 
 /// Interrupt handler for the timer
@@ -91,19 +66,10 @@ extern "x86-interrupt" fn timer_interrupt_handler(_stack_frame: InterruptStackFr
         fn_ptr: keyboard_task,
     };
 
-    let cmdprmpt_task = Task {
-        id: 1,
-        state: TaskState::Ready,
-        priority: TaskPriority::High,
-        fn_ptr: process_prmt,
-    };
-
     // add the task to the job pool
     JOBPOOL.lock().add_task(keyboard_task);
-    scheduler::tick();
-    JOBPOOL.lock().add_task(cmdprmpt_task);
     // call tick so the schedulers can do their updating
-    scheduler::tick();
+    kernel::scheduler::tick();
 
     // notify system that the interrupt has been handled and it's okay to unlock
     unsafe {

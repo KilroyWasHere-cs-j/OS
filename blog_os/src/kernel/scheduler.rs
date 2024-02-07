@@ -7,6 +7,7 @@ use super::display::{print, println};
 // TODO: So the long-term scheduler pops a task from the queue. We need to add a system to allow tasks to stick around so that they can be rescheduled
 
 lazy_static! {
+    /// Global JOBPOOL
     pub static ref JOBPOOL: Arc<Mutex<JobPool>> = Arc::new(Mutex::new(JobPool::new()));
 }
 
@@ -91,10 +92,12 @@ pub trait Scheduler {
 }
 
 impl JobPool {
+    /// Creates new jobpool
     pub fn new() -> Self {
         JobPool { jobs: Vec::new() }
     }
 
+    ///Adds a task to the jobpool
     pub fn add_task(&mut self, task: Task) {
         self.jobs.push(Arc::new(task));
     }
@@ -156,6 +159,8 @@ impl Scheduler for ShortTermScheduler {
         for task in TASK_QUEUE.lock().iter() {
             let fn_ptr = task.fn_ptr;
             fn_ptr();
+            print("Executing task");
+            println(&task.id.to_string()); // Convert usize to string
             //TODO wrap task in a mutex so that we can change its state
         }
     }

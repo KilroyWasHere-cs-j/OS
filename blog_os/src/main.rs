@@ -21,7 +21,7 @@ use lazy_static::lazy_static;
 use spin::Mutex;
 
 use crate::kernel::display::{force_new_line, print, print_s, println, println_s, reset_screen};
-use crate::kernel::scheduler::JobPool;
+use crate::kernel::scheduler::{ JobPool, Task, TaskPriority, TaskState};
 
 mod System69;
 mod kernel;
@@ -46,12 +46,17 @@ fn kernel_main(boot_info: &'static BootInfo) -> ! {
     println("Hello World!");
     println("Booting into Gabeian...");
 
-    // Run memory tests
-    memory_tests();
-
     kernel::delay::delay();
     reset_screen();
 
+    let memory_test = Task{
+        id: 1,
+        state: TaskState::Ready,
+        priority: TaskPriority::High,
+        fn_ptr: memory_tests,
+    };
+
+    JOBPOOL.lock().add_task(memory_test);
     loop {}
 }
 
