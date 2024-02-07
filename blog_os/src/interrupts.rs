@@ -5,7 +5,7 @@ use x86_64::{
     structures::idt::{InterruptDescriptorTable, InterruptStackFrame},
 };
 
-use alloc::string::String;
+use alloc::{string::String, vec::Vec};
 
 #[path = "./System69/mod.rs"]
 mod System69;
@@ -54,38 +54,30 @@ fn keyboard_task() {
     }
 }
 
-
 pub fn process_prmt(){
-    // // Need a better way to do this
-    // let prompt = KEYBOARD.lock().revel_text();
-    // let s: String = prompt.into_iter().collect();
-    // match s.as_str(){
-    //     "help" => {
-    //         println("This is the help menu");
-    //         println("help - displays this menu");
-    //         println("clear - clears the screen");
-    //         println("exit - exits the command prompt");
-    //     },
-    //     "clear" => {
-    //         for _ in 0..100{
-    //             println("");
-    //         }
-    //     },
-    //     "exit" => {
-    //         println("Exiting command prompt");
-    //         return;
-    //     },
-    //     _ => {
-    //         // Do nothing
-    //         // As doing something would cause to many issues
-    //         print("Unknown command: ");
-    //         print(&s);
-    //     }
-    // }
-
-    print("Hello")
+    // Need a better way to do this
+    let prompt = "";
+    match prompt {
+        "help" => {
+            println("Commands: ");
+            println("help - display this message");
+            println("clear - clear the screen");
+            println("exit - exit the shell");
+        },
+        "clear" => {
+            display::reset_screen();
+        },
+        "exit" => {
+            display::reset_screen();
+            println("Exiting...");
+            // exit the shell
+            // exit(0);
+        },
+        _ => {
+            // Do nothing
+        }
+    }
 }
-
 
 // Interrupt handlers
 
@@ -103,11 +95,12 @@ extern "x86-interrupt" fn timer_interrupt_handler(_stack_frame: InterruptStackFr
         id: 1,
         state: TaskState::Ready,
         priority: TaskPriority::High,
-        fn_ptr: cmdprmpt::process_prmt,
+        fn_ptr: process_prmt,
     };
 
     // add the task to the job pool
     JOBPOOL.lock().add_task(keyboard_task);
+    scheduler::tick();
     JOBPOOL.lock().add_task(cmdprmpt_task);
     // call tick so the schedulers can do their updating
     scheduler::tick();
