@@ -1,7 +1,6 @@
-use alloc::{sync::Arc, vec::Vec};
+use alloc::vec::Vec;
 // use crate::println;
 use lazy_static::lazy_static;
-use spin::Mutex;
 
 lazy_static! {
     pub static ref KEYBOARD: spin::Mutex<Keyboard> = spin::Mutex::new(Keyboard::new());

@@ -104,7 +104,7 @@ pub fn memory_tests() {
 /// This function is called on panic.
 #[cfg(not(test))]
 #[panic_handler]
-fn panic(info: &PanicInfo) -> ! {
+fn panic(_info: &PanicInfo) -> ! {
     // println!("{}", info);
     loop {}
 }

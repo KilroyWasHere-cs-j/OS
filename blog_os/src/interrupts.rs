@@ -7,6 +7,9 @@ use x86_64::{
 
 use alloc::string::String;
 
+#[path = "./System69/mod.rs"]
+mod System69;
+
 #[path = "./kernel/mod.rs"]
 mod kernel;
 
@@ -15,7 +18,7 @@ use pic8259::ChainedPics;
 use crate::interrupts::kernel::display;
 use kernel::keyboard::KeyboardHandler;
 
-use self::kernel::scheduler::{self, Task, TaskPriority, TaskState, JOBPOOL};
+use self::{kernel::{display::{print, println}, scheduler::{self, Task, TaskPriority, TaskState, JOBPOOL}}, System69::cmdprmpt};
 use crate::interrupts::kernel::keyboard::KEYBOARD;
 
 // use crate::{print, println};
@@ -51,6 +54,39 @@ fn keyboard_task() {
     }
 }
 
+
+pub fn process_prmt(){
+    // // Need a better way to do this
+    // let prompt = KEYBOARD.lock().revel_text();
+    // let s: String = prompt.into_iter().collect();
+    // match s.as_str(){
+    //     "help" => {
+    //         println("This is the help menu");
+    //         println("help - displays this menu");
+    //         println("clear - clears the screen");
+    //         println("exit - exits the command prompt");
+    //     },
+    //     "clear" => {
+    //         for _ in 0..100{
+    //             println("");
+    //         }
+    //     },
+    //     "exit" => {
+    //         println("Exiting command prompt");
+    //         return;
+    //     },
+    //     _ => {
+    //         // Do nothing
+    //         // As doing something would cause to many issues
+    //         print("Unknown command: ");
+    //         print(&s);
+    //     }
+    // }
+
+    print("Hello")
+}
+
+
 // Interrupt handlers
 
 /// Interrupt handler for the timer
@@ -63,8 +99,16 @@ extern "x86-interrupt" fn timer_interrupt_handler(_stack_frame: InterruptStackFr
         fn_ptr: keyboard_task,
     };
 
+    let cmdprmpt_task = Task {
+        id: 1,
+        state: TaskState::Ready,
+        priority: TaskPriority::High,
+        fn_ptr: cmdprmpt::process_prmt,
+    };
+
     // add the task to the job pool
     JOBPOOL.lock().add_task(keyboard_task);
+    JOBPOOL.lock().add_task(cmdprmpt_task);
     // call tick so the schedulers can do their updating
     scheduler::tick();
 

@@ -1,6 +1,10 @@
-use alloc::{sync::Arc, vec::Vec};
+use alloc::{string::ToString, sync::Arc, task, vec::Vec};
 use lazy_static::lazy_static;
 use spin::Mutex;
+
+use super::display::{print, println};
+
+// TODO: So the long-term scheduler pops a task from the queue. We need to add a system to allow tasks to stick around so that they can be rescheduled
 
 lazy_static! {
     pub static ref JOBPOOL: Arc<Mutex<JobPool>> = Arc::new(Mutex::new(JobPool::new()));
@@ -129,7 +133,6 @@ impl Scheduler for LongTermScheduler {
         for task in JOBPOOL.lock().jobs.iter() {
             TASK_QUEUE.lock().push(task.clone());
         }
-
         // Clear JOBPOOL as all jobs should be loaded by now
         JOBPOOL.lock().flush();
     }
