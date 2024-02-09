@@ -1,9 +1,11 @@
-use alloc::vec::Vec;
+use alloc::{sync::Arc, vec::Vec};
 // use crate::println;
 use lazy_static::lazy_static;
+use spin::Mutex;
 
 lazy_static! {
-    pub static ref KEYBOARD: spin::Mutex<Keyboard> = spin::Mutex::new(Keyboard::new());
+    
+    pub static ref KEYBOARD: Arc<Mutex<Keyboard>> = Arc::new(Mutex::new(Keyboard::new()));
 }
 
 pub struct Keyboard {

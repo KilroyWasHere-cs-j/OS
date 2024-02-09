@@ -8,3 +8,11 @@ pub fn delay() {
         }
     }
 }
+
+pub fn s_delay() {
+    for _ in 0..10000000 {
+        unsafe {
+            asm!("nop");
+        }
+    }
+}
