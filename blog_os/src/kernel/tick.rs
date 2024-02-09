@@ -1,6 +1,6 @@
 use alloc::{string::{String, ToString}, vec::Vec};
 
-use super::{display::{print, print_s, println}, keyboard::{self, KeyboardHandler, KEYBOARD}, scheduler::Task};
+use super::{display::{print, print_s, println}, keyboard::{self, KeyboardHandler, KEYBOARD}, scheduler::{Scheduler, Task}};
 
 fn keyboard_task() {
     let keys = KEYBOARD.lock().revel_text();
@@ -17,14 +17,12 @@ fn task_test(){
     //print("Task Test");
 }
 
-static mut TASK_QUEUE: Vec<Task> = Vec::new();
-
 pub fn tick(){
 
     let keyboard_task = Task{
         id: 0,
         sticky: true,
-        priority: super::scheduler::Priority::LOW,
+        priority: super::scheduler::Priority::HIGH,
         state: super::scheduler::State::READY,
         fn_ptr: keyboard_task,
     };
@@ -37,21 +35,11 @@ pub fn tick(){
         fn_ptr: task_test,
     };
 
-    unsafe{
-        TASK_QUEUE.push(keyboard_task);
-        TASK_QUEUE.push(task_test);
-    }
+    super::scheduler::add_task(keyboard_task);
+    super::scheduler::add_task(task_test);
 
-    for task in unsafe{TASK_QUEUE.iter_mut()}{
-        let task_fn = task.fn_ptr;
-        task_fn();
-    }
+    super::scheduler::LongTermScheduler::new().schedule();
+    super::scheduler::ShortTermScheduler::new().schedule();
 
     //println(count_tasks().to_string().as_str());
-}
-
-pub fn count_tasks() -> usize{
-    unsafe{
-        TASK_QUEUE.len()
-    }
 }
