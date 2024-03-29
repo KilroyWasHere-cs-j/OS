@@ -1,10 +1,16 @@
-use alloc::{string::{String, ToString}, vec::Vec};
+#![allow(dead_code)]
 
-use super::{display::{print, print_s, println}, keyboard::{self, KeyboardHandler, KEYBOARD}, scheduler::{Scheduler, Task}};
+use alloc::string::String;
+
+use super::{
+    display::print_s,
+    keyboard::{KeyboardHandler, KEYBOARD},
+    scheduler::{Scheduler, Task},
+};
 
 fn keyboard_task() {
     let keys = KEYBOARD.lock().revel_text(); // TODO make this it's own task
-    // clear the buffer
+                                             // clear the buffer
     KEYBOARD.lock().flush();
     // writer.clear_line();
     // only print if there are keys to print
@@ -13,9 +19,8 @@ fn keyboard_task() {
     }
 }
 
-pub fn tick(){
-
-    let keyboard_task = Task{
+pub fn tick() {
+    let keyboard_task = Task {
         id: 0,
         sticky: true,
         priority: super::scheduler::Priority::HIGH,
@@ -23,7 +28,7 @@ pub fn tick(){
         fn_ptr: keyboard_task,
     };
 
-    let cmd_task = Task{
+    let cmd_task = Task {
         id: 1,
         sticky: true,
         priority: super::scheduler::Priority::HIGH,

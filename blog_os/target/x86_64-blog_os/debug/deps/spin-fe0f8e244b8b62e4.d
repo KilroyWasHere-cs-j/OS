@@ -1,0 +1,12 @@
+/home/gabrielt/Git/OS/blog_os/target/x86_64-blog_os/debug/deps/libspin-fe0f8e244b8b62e4.rmeta: /home/gabrielt/.cargo/registry/src/index.crates.io-6f17d22bba15001f/spin-0.9.8/src/lib.rs /home/gabrielt/.cargo/registry/src/index.crates.io-6f17d22bba15001f/spin-0.9.8/src/barrier.rs /home/gabrielt/.cargo/registry/src/index.crates.io-6f17d22bba15001f/spin-0.9.8/src/lazy.rs /home/gabrielt/.cargo/registry/src/index.crates.io-6f17d22bba15001f/spin-0.9.8/src/mutex.rs /home/gabrielt/.cargo/registry/src/index.crates.io-6f17d22bba15001f/spin-0.9.8/src/mutex/spin.rs /home/gabrielt/.cargo/registry/src/index.crates.io-6f17d22bba15001f/spin-0.9.8/src/once.rs /home/gabrielt/.cargo/registry/src/index.crates.io-6f17d22bba15001f/spin-0.9.8/src/relax.rs /home/gabrielt/.cargo/registry/src/index.crates.io-6f17d22bba15001f/spin-0.9.8/src/rwlock.rs
+
+/home/gabrielt/Git/OS/blog_os/target/x86_64-blog_os/debug/deps/spin-fe0f8e244b8b62e4.d: /home/gabrielt/.cargo/registry/src/index.crates.io-6f17d22bba15001f/spin-0.9.8/src/lib.rs /home/gabrielt/.cargo/registry/src/index.crates.io-6f17d22bba15001f/spin-0.9.8/src/barrier.rs /home/gabrielt/.cargo/registry/src/index.crates.io-6f17d22bba15001f/spin-0.9.8/src/lazy.rs /home/gabrielt/.cargo/registry/src/index.crates.io-6f17d22bba15001f/spin-0.9.8/src/mutex.rs /home/gabrielt/.cargo/registry/src/index.crates.io-6f17d22bba15001f/spin-0.9.8/src/mutex/spin.rs /home/gabrielt/.cargo/registry/src/index.crates.io-6f17d22bba15001f/spin-0.9.8/src/once.rs /home/gabrielt/.cargo/registry/src/index.crates.io-6f17d22bba15001f/spin-0.9.8/src/relax.rs /home/gabrielt/.cargo/registry/src/index.crates.io-6f17d22bba15001f/spin-0.9.8/src/rwlock.rs
+
+/home/gabrielt/.cargo/registry/src/index.crates.io-6f17d22bba15001f/spin-0.9.8/src/lib.rs:
+/home/gabrielt/.cargo/registry/src/index.crates.io-6f17d22bba15001f/spin-0.9.8/src/barrier.rs:
+/home/gabrielt/.cargo/registry/src/index.crates.io-6f17d22bba15001f/spin-0.9.8/src/lazy.rs:
+/home/gabrielt/.cargo/registry/src/index.crates.io-6f17d22bba15001f/spin-0.9.8/src/mutex.rs:
+/home/gabrielt/.cargo/registry/src/index.crates.io-6f17d22bba15001f/spin-0.9.8/src/mutex/spin.rs:
+/home/gabrielt/.cargo/registry/src/index.crates.io-6f17d22bba15001f/spin-0.9.8/src/once.rs:
+/home/gabrielt/.cargo/registry/src/index.crates.io-6f17d22bba15001f/spin-0.9.8/src/relax.rs:
+/home/gabrielt/.cargo/registry/src/index.crates.io-6f17d22bba15001f/spin-0.9.8/src/rwlock.rs:

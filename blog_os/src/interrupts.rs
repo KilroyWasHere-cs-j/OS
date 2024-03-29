@@ -1,25 +1,18 @@
 use lazy_static::lazy_static;
 use pc_keyboard::{layouts, DecodedKey, HandleControl, Keyboard, ScancodeSet1};
-use spin::Mutex;
 use x86_64::{
     instructions::port::Port,
     structures::idt::{InterruptDescriptorTable, InterruptStackFrame},
 };
-
-use alloc::{string::{String, ToString}, vec::Vec};
 
 #[path = "./kernel/mod.rs"]
 pub mod kernel;
 
 use pic8259::ChainedPics;
 
-use crate::interrupts::kernel::display;
 use kernel::keyboard::KeyboardHandler;
 
-
-use self::kernel::{display::print, keyboard, scheduler::{State, Task}};
 use crate::interrupts::kernel::keyboard::KEYBOARD;
-use crate::interrupts::kernel::scheduler::Priority; // Import the missing type
 
 // use crate::{print, println};
 

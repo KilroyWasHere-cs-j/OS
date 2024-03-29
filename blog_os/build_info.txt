@@ -1,0 +1,9 @@
+These are the commands that need to be ran inorder to build and run the program
+
+cargo build
+
+cargo bootimage
+
+ qemu-system-x86_64 -drive format=raw,file=*correct path*
+
+ *correct path* can be found at the bottom of the output for the "cargo bootimage" command

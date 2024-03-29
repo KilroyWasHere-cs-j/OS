@@ -6,27 +6,16 @@
 #![feature(abi_x86_interrupt)]
 extern crate alloc;
 
-use alloc::boxed::Box;
-use alloc::string::{String, ToString};
-use alloc::sync::Arc;
-use alloc::vec::Vec;
 use bootloader::entry_point;
 use bootloader::BootInfo;
 
-use alloc::{rc::Rc, vec};
 use blog_os::memory;
 use blog_os::memory::BootInfoFrameAllocator;
-use kernel::display;
-use kernel::keyboard::{KeyboardHandler, KEYBOARD};
 use core::panic::PanicInfo;
-use lazy_static::lazy_static;
-use spin::Mutex;
 
-use crate::kernel::display::{force_new_line, print, print_s, println, println_s, reset_screen};
-
+use crate::kernel::display::{println, reset_screen};
 
 mod kernel;
-
 
 entry_point!(kernel_main);
 fn kernel_main(boot_info: &'static BootInfo) -> ! {
@@ -44,7 +33,10 @@ fn kernel_main(boot_info: &'static BootInfo) -> ! {
     println("Hello World!");
     println("Booting into Gabeian...");
 
-    //kernel::delay::delay();
+    println("Running pre_boot tests");
+
+    println("Reseting screen");
+    kernel::delay::delay(10000000);
     reset_screen();
 
     loop {}
@@ -53,7 +45,6 @@ fn kernel_main(boot_info: &'static BootInfo) -> ! {
 pub fn dummy() {
     println("Hello World");
 }
-
 
 /// This function is called on panic.
 #[cfg(not(test))]
