@@ -50,7 +50,8 @@ extern "x86-interrupt" fn timer_interrupt_handler(_stack_frame: InterruptStackFr
 }
 
 extern "x86-interrupt" fn keyboard_interrupt_handler(_stack_frame: InterruptStackFrame) {
-    // create a new keyboard with the US layout
+    // create a new keyboard with the US layouts
+    // Need to find a way to do this without creating a new object each time
     let mut keyboard = Keyboard::new(layouts::Us104Key, ScancodeSet1, HandleControl::Ignore);
 
     // read the scancode from the data port

@@ -6,6 +6,7 @@
 #![feature(abi_x86_interrupt)]
 extern crate alloc;
 
+use blog_os::interrupts;
 use bootloader::entry_point;
 use bootloader::BootInfo;
 
@@ -14,7 +15,6 @@ use blog_os::memory::BootInfoFrameAllocator;
 use core::panic::PanicInfo;
 
 use crate::kernel::display::{println, reset_screen};
-
 mod kernel;
 
 entry_point!(kernel_main);
@@ -30,12 +30,15 @@ fn kernel_main(boot_info: &'static BootInfo) -> ! {
 
     allocator::init_heap(&mut mapper, &mut frame_allocator).expect("heap initialization failed");
 
-    println("Hello World!");
     println("Booting into Gabeian...");
 
     println("Running pre_boot tests");
 
     println("Reseting screen");
+
+    interrupts::kernel::tick::setup();
+
+    // Gives the user just long enough to read what's on the sreen
     kernel::delay::delay(10000000);
     reset_screen();
 

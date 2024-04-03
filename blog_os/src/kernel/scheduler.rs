@@ -7,10 +7,12 @@ Written: 2/08/2024
 Kilroy Was Here
 */
 
-use alloc::vec::Vec;
+use crate::kernel::display::println;
+
+use alloc::{borrow::ToOwned, string::ToString, vec::Vec};
 
 static mut TASK_POOL: Vec<Task> = Vec::new();
-static mut TASK_QUEUE: Vec<Task> = Vec::new();
+//static mut TASK_QUEUE: Vec<Task> = Vec::new();
 
 /// A task priority
 /// - LOW: A low priority task
@@ -20,7 +22,7 @@ static mut TASK_QUEUE: Vec<Task> = Vec::new();
 pub enum Priority {
     LOW,
     MED,
-    HIGH
+    HIGH,
 }
 
 /// A task state
@@ -29,13 +31,12 @@ pub enum Priority {
 /// - BLOCKED: A task is blocked from being executed
 /// - CLEARED: A task has been cleared from the task pool
 #[derive(Clone)]
-pub enum State{
+pub enum State {
     READY,
     RUNNING,
     BLOCKED,
-    CLEARED
+    CLEARED,
 }
-
 
 /// A task
 /// - id: A unique identifier for the task
@@ -44,7 +45,7 @@ pub enum State{
 /// - state: The state of the task
 /// - fn_ptr: A function pointer to the task
 #[derive(Clone)]
-pub struct Task{
+pub struct Task {
     pub id: usize,
     pub sticky: bool,
     pub priority: Priority,
@@ -52,20 +53,13 @@ pub struct Task{
     pub fn_ptr: fn(),
 }
 
-
 /// A long term scheduler
 /// - holding_queue: A queue of tasks that are waiting to be executed
-pub struct LongTermScheduler{
+pub struct LongTermScheduler {
     pub holding_queue: Vec<Task>,
 }
 
-pub struct ShortTermScheduler{
-    pub run_queue: Vec<Task>,
-    pub holding_queue: Vec<Task>,
-    pub current_task: Task,
-}
-
-pub trait Scheduler{
+pub trait Scheduler {
     /// Create a new scheduler
     /// - returns: A new scheduler
     fn new() -> Self;
@@ -85,30 +79,33 @@ pub trait Scheduler{
     fn sort(&mut self);
 }
 
-impl Scheduler for LongTermScheduler{
-    fn new() -> LongTermScheduler{
-        LongTermScheduler{
+impl Scheduler for LongTermScheduler {
+    fn new() -> LongTermScheduler {
+        LongTermScheduler {
             holding_queue: Vec::new(),
         }
     }
 
-    fn schedule(&mut self){
-        for task in unsafe{TASK_POOL.iter()}{
-            execute_task(task.clone());
+    fn schedule(&mut self) {
+        unsafe {
+            for task in TASK_POOL.iter() {
+                execute_task(task.clone());
+            }
         }
+        self.prune();
     }
 
     fn flush(&mut self) {
-        unsafe{
-            TASK_POOL.clear();
-        }
+        //unsafe {
+        //    TASK_POOL.clear();
+        //}
     }
 
     fn sort(&mut self) {
         unsafe {
-            for task in TASK_POOL.iter(){
+            for task in TASK_POOL.iter() {
                 let task_pro = task.priority.clone();
-                match task_pro{
+                match task_pro {
                     Priority::LOW => {
                         self.holding_queue.push(task.clone());
                     }
@@ -123,15 +120,22 @@ impl Scheduler for LongTermScheduler{
         }
     }
 
+    /// Removes all non-sticky tasks from the job pool
     fn prune(&mut self) {
-        todo!()
+        unsafe {
+            for task in TASK_POOL.iter() {
+                if task.sticky == false {
+                    TASK_POOL.remove(task.id);
+                }
+            }
+        }
     }
 }
 
 /// Execute a task
 /// - task: A task to be executed
 /// - returns: None
-fn execute_task(task: Task){
+fn execute_task(task: Task) {
     let fn_ptr = task.fn_ptr;
     fn_ptr();
 }
@@ -142,20 +146,8 @@ fn execute_task(task: Task){
 /// # Safety
 /// This function is unsafe because it accesses a mutable static variable
 /// TASK_POOL
-pub fn add_task(task: Task){
-    unsafe{
+pub fn add_task(task: Task) {
+    unsafe {
         TASK_POOL.push(task);
-    }
-}
-
-/// Remove a task from the task pool
-/// - task: A task to be removed from the task pool
-/// - returns: None
-/// # Safety
-/// This function is unsafe because it accesses a mutable static variable
-/// TASK_POOL
-pub fn remove_task(task: Task){
-    unsafe{
-        TASK_POOL.retain(|x| x.id != task.id);
     }
 }

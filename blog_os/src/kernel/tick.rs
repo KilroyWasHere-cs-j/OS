@@ -19,7 +19,7 @@ fn keyboard_task() {
     }
 }
 
-pub fn tick() {
+pub fn setup() {
     let keyboard_task = Task {
         id: 0,
         sticky: true,
@@ -36,11 +36,19 @@ pub fn tick() {
         fn_ptr: super::tasks::cmd_task,
     };
 
-    //super::scheduler::add_task(cmd_task);
+    let dummy_task = Task {
+        id: 2,
+        sticky: false,
+        priority: super::scheduler::Priority::LOW,
+        state: super::scheduler::State::READY,
+        fn_ptr: super::tasks::dummy_task,
+    };
+
+    //super::scheduler::add_task(dummy_task);
+    super::scheduler::add_task(cmd_task);
     super::scheduler::add_task(keyboard_task);
+}
 
+pub fn tick() {
     super::scheduler::LongTermScheduler::new().schedule();
-    // super::scheduler::ShortTermScheduler::new().schedule();
-
-    //println(count_tasks().to_string().as_str());
 }

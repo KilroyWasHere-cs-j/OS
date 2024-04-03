@@ -1,11 +1,10 @@
+use alloc::string::ToString;
 /// A module for displaying text on the screen
 ///
 /// Author: Gabriel Tower with some help from Josh Kolasa
 /// Date: 2020-12-28
 /// Kilroy Was Here
-
 use alloc::{string::String, sync::Arc, vec::Vec};
-use alloc::string::ToString;
 use lazy_static::lazy_static;
 use spin::Mutex;
 
@@ -13,10 +12,8 @@ use spin::Mutex;
 const BUFFER_HEIGHT: usize = 25;
 /// The width of the text buffer (normally 80 columns).
 const BUFFER_WIDTH: usize = 80;
-const SPACING : usize = 1; // Space between each character
+const SPACING: usize = 1; // Space between each character
 
-/// Creates a static writer instance that can be used for printing to the VGA text buffer.
-/// Wraps it in a Mutex to allow for concurrent access and an Arc to allow for sharing the instance
 lazy_static! {
     /// A static writer instance that can be used for printing to the VGA text buffer.
     pub static ref WRITER: Arc<Mutex<Writer>> = Arc::new(Mutex::new(Writer::new()));
@@ -122,7 +119,7 @@ impl WriterTrait for Writer {
     // Thanks to Josh Kolasa for this math
     fn new_line(&mut self) {
         let hold = (BUFFER_WIDTH as isize * self.row_position) - self.column_position;
-        for i in 0..hold{
+        for i in 0..hold {
             self.write_byte(b' ');
         }
         self.row_position += 1;
@@ -130,7 +127,7 @@ impl WriterTrait for Writer {
 
     fn reset_screen(&mut self) {
         let vga_buffer = 0xb8000 as *mut u8;
-        for i in 0..BUFFER_WIDTH * BUFFER_HEIGHT{
+        for i in 0..BUFFER_WIDTH * BUFFER_HEIGHT {
             unsafe {
                 *vga_buffer.offset((i * 2) as isize) = b' ';
                 *vga_buffer.offset((i * 2 + 1) as isize) = 0xb;
@@ -177,11 +174,11 @@ impl WriterTrait for Writer {
 
 /// TODO: All the code below needs/should be replaced with less satanic shit
 // TODO: Replace with println! and print! macros before release
-pub fn print_s(v: String){
+pub fn print_s(v: String) {
     WRITER.lock().print(v);
 }
 
-pub fn println_s(v: String){
+pub fn println_s(v: String) {
     WRITER.lock().print(v);
     WRITER.lock().new_line();
 }
