@@ -12,9 +12,10 @@ use pic8259::ChainedPics;
 
 use kernel::keyboard::KeyboardHandler;
 
-use crate::interrupts::kernel::keyboard::KEYBOARD;
-
-// use crate::{print, println};
+use crate::{
+    interrupts::kernel::keyboard::KEYBOARD,
+    kernel::display::{print, println},
+};
 
 pub const PIC_1_OFFSET: u8 = 32;
 pub const PIC_2_OFFSET: u8 = PIC_1_OFFSET + 8;
@@ -63,8 +64,12 @@ extern "x86-interrupt" fn keyboard_interrupt_handler(_stack_frame: InterruptStac
         // print the key event
         if let Some(key) = keyboard.process_keyevent(key_event) {
             match key {
+                DecodedKey::RawKey(key) => match key {
+                    pc_keyboard::KeyCode::Escape => println("Debug0"),
+                    pc_keyboard::KeyCode::Backspace => print("Debug1"),
+                    _ => {}
+                },
                 DecodedKey::Unicode(character) => KEYBOARD.lock().on_key(character),
-                DecodedKey::RawKey(_key) => (),
             }
         }
     }
