@@ -46,6 +46,8 @@ pub struct Writer {
     row_position: isize,
     /// A vector of characters that are to be printed to the screen
     text_buffer: Vec<char>,
+    ///Height of the screen to prevent overrunning
+    window_height: isize,
 }
 
 pub trait WriterTrait {
@@ -55,7 +57,8 @@ pub trait WriterTrait {
     fn reset_screen(&mut self);
     fn clear_line(&mut self);
     fn write_byte(&mut self, byte: u8);
-    fn test(&mut self, hold: u8);
+    fn set_column_position(&mut self, position: isize);
+    fn set_row_position(&mut self, position: isize);
 }
 
 impl WriterTrait for Writer {
@@ -73,6 +76,7 @@ impl WriterTrait for Writer {
             text_buffer: Vec::new(),
             column_position: 0,
             row_position: 1,
+            window_height: 10,
         }
     }
 
@@ -89,15 +93,19 @@ impl WriterTrait for Writer {
     /// writer.print("Hello World!".to_string());
     /// ```
     fn print(&mut self, printable: String) {
-        // Convert 'printable' to char and load into text_buffer
-        for i in printable.chars() {
-            self.text_buffer.push(i);
-        }
+        if self.row_position <= self.window_height {
+            // Convert 'printable' to char and load into text_buffer
+            for i in printable.chars() {
+                self.text_buffer.push(i);
+            }
 
-        for i in 0..self.text_buffer.len() {
-            self.write_byte(self.text_buffer[i] as u8);
+            for i in 0..self.text_buffer.len() {
+                self.write_byte(self.text_buffer[i] as u8);
+            }
+        } else {
+            self.reset_screen();
+            self.row_position = 0;
         }
-
         // Although this causes a funny looking glitch it's necessary to clear the text_buffer :(
         self.text_buffer.clear();
 
@@ -119,7 +127,7 @@ impl WriterTrait for Writer {
     // Thanks to Josh Kolasa for this math
     fn new_line(&mut self) {
         let hold = (BUFFER_WIDTH as isize * self.row_position) - self.column_position;
-        for i in 0..hold {
+        for _i in 0..hold {
             self.write_byte(b' ');
         }
         self.row_position += 1;
@@ -133,10 +141,20 @@ impl WriterTrait for Writer {
                 *vga_buffer.offset((i * 2 + 1) as isize) = 0xb;
             }
         }
+        // self.row_position = 0;
+        self.column_position = 0;
     }
 
     fn clear_line(&mut self) {
         todo!();
+    }
+
+    fn set_column_position(&mut self, position: isize) {
+        self.column_position = position;
+    }
+
+    fn set_row_position(&mut self, position: isize) {
+        self.row_position = position;
     }
 
     /// Writes a byte to the VGA buffer
@@ -165,11 +183,6 @@ impl WriterTrait for Writer {
             }
         }
     }
-
-    /// Burner function for testing
-    /// # TODO
-    /// * Remove this function before release
-    fn test(&mut self, hold: u8) {}
 }
 
 /// TODO: All the code below needs/should be replaced with less satanic shit

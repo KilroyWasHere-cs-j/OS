@@ -1,21 +1,18 @@
 use alloc::string::String;
 
-use crate::kernel;
-
 use super::{
-    display::print,
-    display::println,
+    display::{self, println},
     keyboard::{KeyboardHandler, KEYBOARD},
 };
 
 pub fn cmd_task() {
     let input = KEYBOARD.lock().revel_text().iter().collect::<String>();
     let command = input.split(" ").next().unwrap_or("");
-    if command == "echo" {
-        print("e");
-    }
-    if command == "c" {
-        kernel::display::reset_screen();
+    if !command.is_empty() {
+        match command {
+            "cl" => display::reset_screen(),
+            _ => (),
+        }
     }
 }
 
