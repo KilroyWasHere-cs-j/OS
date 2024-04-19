@@ -35,24 +35,10 @@ impl KeyboardHandler for Keyboard {
     fn on_key(&mut self, key: char) {
         // ! TODO: Backspace doesn't work
         // println!("{:?}", key);
-        match key {
-            '\u{8}' => {
-                self.text_buffer.pop();
-            }
-            '\u{14}' => {
-                self.caps_lock = !self.caps_lock;
-                println("caps_lock");
-            }
-            '\u{1b}' => {
-                // Escape
-            }
-            _ => {
-                if self.caps_lock {
-                    self.text_buffer.push(key.to_uppercase().next().unwrap());
-                } else {
-                    self.text_buffer.push(key);
-                }
-            }
+        if self.caps_lock {
+            self.text_buffer.push(key.to_uppercase().next().unwrap());
+        } else {
+            self.text_buffer.push(key);
         }
     }
 
