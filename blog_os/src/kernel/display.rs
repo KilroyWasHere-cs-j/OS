@@ -122,7 +122,7 @@ impl WriterTrait for Writer {
     /// use crate::kernel::display::WriterTrait;
     /// use crate::kernel::display::Writer;
     /// let mut writer = Writer::new();
-    /// writer.new_line();
+    /// writr.new_line();
     /// ```
     // Thanks to Josh Kolasa for this math
     fn new_line(&mut self) {
@@ -130,7 +130,7 @@ impl WriterTrait for Writer {
         for _i in 0..hold {
             self.write_byte(b' ');
         }
-        self.row_position += 1;
+        self.column_position += 1;
     }
 
     fn reset_screen(&mut self) {
@@ -141,12 +141,12 @@ impl WriterTrait for Writer {
                 *vga_buffer.offset((i * 2 + 1) as isize) = 0xb;
             }
         }
-        // self.row_position = 0;
         self.column_position = 0;
     }
 
     fn clear_line(&mut self) {
-        todo!();
+        self.column_position = self.column_position - 1;
+        self.write_byte(b' ');
     }
 
     fn set_column_position(&mut self, position: isize) {

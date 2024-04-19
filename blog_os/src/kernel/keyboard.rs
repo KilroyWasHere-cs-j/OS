@@ -3,8 +3,9 @@ use alloc::{sync::Arc, vec::Vec};
 use lazy_static::lazy_static;
 use spin::Mutex;
 
+use super::display::println;
+
 lazy_static! {
-    
     pub static ref KEYBOARD: Arc<Mutex<Keyboard>> = Arc::new(Mutex::new(Keyboard::new()));
 }
 
@@ -41,12 +42,13 @@ impl KeyboardHandler for Keyboard {
             }
             '\u{14}' => {
                 self.caps_lock = !self.caps_lock;
+                println("caps_lock");
             }
             '\u{1b}' => {
                 // Escape
             }
             _ => {
-                if self.caps_lock || self.shift {
+                if self.caps_lock {
                     self.text_buffer.push(key.to_uppercase().next().unwrap());
                 } else {
                     self.text_buffer.push(key);
