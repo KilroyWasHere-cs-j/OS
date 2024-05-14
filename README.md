@@ -22,3 +22,5 @@ Below are the steps to correctly build and boot PINE OS.
 ```qemu-system-x86_64 -drive format=raw,file=[path to bootimage-blog_os.bin]```
 
 The bootable image will be located inside your target directory ```/target/z86_64-blog_os/debug/bootimage-blog_os.bin```
+
+First build will be slow.
